@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous">
+</script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous">
+</script>
+<!-- AngularJS -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/3.6.6/firebase.js"></script>
+<!-- AngularFire -->
+<script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script type="text/javascript" src="https://ptreesys.mx/sharedfiles/src/jquery-loader.js"></script>
+<script src="javascript/loader.js"></script>
+<link rel="stylesheet" href="css/loader.css">
+
+<body ng-app="AppAdmin" ng-controller="ctrlHome">
+    <script>
+        $.loader.open(); // opening the loader
+    </script>
+    <div class="page-wrapper chiller-theme" ng-show="viewAll">
+        <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
+            <i class="fas fa-bars"></i>
+        </a>
+        <nav id="sidebar" class="sidebar-wrapper">
+            <div class="sidebar-content">
+                <div class="sidebar-brand" style="background: white;text-align: center;">
+                    <a href="#"><img style="max-width:75px; margin-top: -7px;" src="https://solorionietoabogados.mx/wp-content/uploads/2020/08/SOLOVROI_LOGO.png"></a>
+                    <div id="close-sidebar">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+                <div class="sidebar-header">
+                    <div class="user-pic">
+                        <img class="img-responsive img-rounded" ng-if="!photoURL" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg" alt="User picture">
+                        <img class="img-responsive img-rounded" ng-if="photoURL" src="{{photoURL}}" alt="User picture">
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{name}}
+                        </span>
+                        <span class="user-role">{{tipo}}</span>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul>
+                        <li>
+                            <a onclick="CallPage('Index')" style='cursor: pointer;'>
+                                <i class="fas fa-home"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a onclick="CallPage('Perfil')" ng-show="tipo == 'Administrador'" style='cursor: pointer;'>
+                                <i class="fas fa-user-plus"></i>
+                                <span>Perfiles</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- sidebar-menu  -->
+            </div>
+            <!-- sidebar-content  -->
+            <div class="sidebar-footer">
+            </div>
+        </nav>
+        <div class="page-wrapper chiller-theme" ng-show="viewAll">
+            <!-- sidebar-wrapper  -->
+            <main class="page-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12" style="text-align: center;">
+                            <h5 class="center">Historial</h5>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Tipo</label>
+                            <select class="form-control" ng-change="viewData=false;" ng-model="sindicatoSearch" required>
+                                <option value="" disabled>Seleccione una opción</option>
+                                <option value="CDMX">CDMX</option>
+                                <option value="Federal">Federal</option>
+                                <option value="Foraneas">Foraneas</option>
+                                <option value="Amparos">Amparos</option>
+                                <option value="Tribunal">Tribunal</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label style="margin-top: 30px;"><br></label>
+                            <button class="btn btn-outline-success my-2 my-sm-0" ng-click="getSearch()"><i
+                                    class="fas fa-search"></i></button>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Filtrar</label>
+                            <input type="text" class="form-control" ng-model="filterData">
+                        </div>
+                        <div class="col-md-2">
+                            <label style="margin-top: 30px;"><br></label>
+                            <button class="btn btn-outline-primary my-2 my-sm-0" ng-hide="tipo == 'Lectura'" data-toggle="modal" data-target="#new-compra" ng-click="clearModalNew();" class="btn btn-primary "><i
+                                    class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="col-md-12">
+                            <br>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div style="margin: 25px 0px; padding: 0;overflow:scroll;height:100%;width:100%;">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Tipo</th>
+                                                <th scope="col">Junta Local</th>
+                                                <th scope="col">Expediente</th>
+                                                <th scope="col">Actor</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'CDMX'|| sindicatoSearch == 'Federal' || sindicatoSearch == 'Foraneas'|| sindicatoSearch == 'Amparos'|| sindicatoSearch =='Tribunal'">Demandado</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Tipo de Amparo</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Circuito</th>
+                                                <th scope="col" ng-if="sindicatoSearch =='Tribunal'">Año</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Número de Amparo</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Tribunal/Juzgado</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Recursos</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Audiencia Constitucional</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Estado</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Fecha de Ejecución/ Publicación/Notificación</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Amparos'">Fecha de revisión</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal' || sindicatoSearch == 'Foraneas' || sindicatoSearch =='Tribunal'">Próxima Audiencia</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal'|| sindicatoSearch == 'Foraneas'|| sindicatoSearch =='Tribunal'">Estado Procesal</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Federal'|| sindicatoSearch =='Tribunal'">Amparo</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal'|| sindicatoSearch =='Tribunal'">Ref</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal'">Contacto</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch =='Federal'">Cuestionario Porcentaje</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Foraneas'">Estado</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'Foraneas'">Municipio</th>
+                                                <th scope="col" ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal'|| sindicatoSearch == 'Foraneas'|| sindicatoSearch =='Tribunal'">De Quien Es</th>
+                                                <!--
+                                                <th scope="col">Octubre</th>
+                                                <th scope="col">Noviembre</th>
+                                                -->
+                                                <th scope="col">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="row in dataSearch | filter:filterData" ng-show="viewData">
+                                                <td>
+                                                    {{row.tipo}}
+                                                </td>
+                                                <td>
+                                                    {{row.juntaLocal}}
+                                                </td>
+                                                <td>
+                                                    {{row.expediente}}
+                                                </td>
+                                                <td>
+                                                    {{row.actor}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'CDMX'|| sindicatoSearch == 'Federal' || sindicatoSearch == 'Foraneas'|| sindicatoSearch == 'Amparos'|| sindicatoSearch =='Tribunal'">
+                                                    {{row.demandado}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.tipoAmparo}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.circuito}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch =='Tribunal'">
+                                                    {{row.anio}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.numAmparo}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.tribunal}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.recursos}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.audienciaConstitucional}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.estadoA}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.fechaPublicacion}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Amparos'">
+                                                    {{row.fechaRevision}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal' || sindicatoSearch == 'Foraneas' || sindicatoSearch =='Tribunal'">
+                                                    {{row.proxAudiencia}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal'|| sindicatoSearch == 'Foraneas'|| sindicatoSearch =='Tribunal'">
+                                                    {{row.estadoProcesal}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Federal'|| sindicatoSearch =='Tribunal'">
+                                                    {{row.amparo}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal'|| sindicatoSearch =='Tribunal'">
+                                                    {{row.ref}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch =='Federal'">
+                                                    {{row.contacto}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch =='Federal'">
+                                                    {{row.cuestionarioContrato}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Foraneas'">
+                                                    {{row.estado}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'Foraneas'">
+                                                    {{row.municipio}}
+                                                </td>
+                                                <td ng-if="sindicatoSearch == 'CDMX' || sindicatoSearch == 'Federal'|| sindicatoSearch == 'Foraneas'|| sindicatoSearch =='Tribunal'">
+                                                    {{row.deQuienEs}}
+                                                </td>
+                                                <!--
+                                                <td>
+                                                    <span ng-show="row.mesNum == 10"> {{row.nameEmpresa}}</span>
+                                                </td>
+                                                <td>
+                                                    <span ng-show="row.mesNum == 11"> {{row.nameEmpresa}}</span>
+                                                </td>
+                                                -->
+                                                <td>
+                                                    <button class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-comentario" ng-click="getData(row)" title="Comentarios"><i class="fas fa-comments" style="color: white"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="new-compra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <form ng-submit="saveCompra()">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Nuevo registro</h5>
+                            <a type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </a>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-row">
+                                <div class=" col-md-4">
+                                    <label>Tipo<span style="color:red;">*</span>:</label>
+                                    <select class="form-control" ng-change="getEstadosAll()" ng-model="newObjecto.tipo" required>
+                            <option value="" disabled>Seleccione una opción</option>
+                            <option value="CDMX">CDMX</option>
+                            <option value="Federal">Federal</option>
+                            <option value="Foraneas">Foraneas</option>
+                            <option value="Amparos">Amparos</option>
+                            <option value="Tribunal">Tribunal</option>
+                        </select>
+                                </div>
+                                <div class=" col-md-4">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Junta Local<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.juntaLocal" required>
+                                    </div>
+                                </div>
+                                <div class=" col-md-4">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Expediente<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.expediente" required>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Actor<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.actor" required>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Correo<span style="color:red;">*</span>:</label>
+                                        <input type="email" class="form-control" ng-model="newObjecto.correo" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'CDMX'|| newObjecto.tipo == 'Federal' || newObjecto.tipo == 'Foraneas'|| newObjecto.tipo == 'Amparos'|| newObjecto.tipo =='Tribunal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Demandado<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.demandado" required>
+                                    </div>
+                                </div>
+                                <div class=" col-md-4" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Tipo de Amparo<span style="color:red;">*</span>:</label>
+                                        <select class="form-control" ng-model="newObjecto.tipoAmparo" required>
+                            <option value="" disabled>Seleccione una opción</option>
+                            <option value="Directo">Directo</option>
+                            <option value="Indirecto">Indirecto</option>
+                            <option value="Amparo Indirecto 1854/2019">Amparo Indirecto 1854/2019</option>
+                            <option value="Revisión Adhesiva">Revisión Adhesiva</option>                            
+                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Circuito</label>
+                                        <input class="form-control" ng-model="newObjecto.circuito" min=0 type="number" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo =='Tribunal'">
+                                    <div class="form-group">
+                                        <label>Año</label>
+                                        <input class="form-control" ng-model="newObjecto.anio" type="text" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Número de Amparo</label>
+                                        <input class="form-control" ng-model="newObjecto.numAmparo" type="text" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Tribunal/Juzgado</label>
+                                        <textarea class="form-control" ng-model="newObjecto.tribunal" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Recursos</label>
+                                        <textarea class="form-control" ng-model="newObjecto.recursos" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Audiencia Constitucional</label>
+                                        <textarea class="form-control" ng-model="newObjecto.audienciaConstitucional" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Estado</label>
+                                        <textarea class="form-control" ng-model="newObjecto.estadoA" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Fecha de Ejecución/ Publicación/Notificación</label>
+                                        <textarea class="form-control" ng-model="newObjecto.fechaPublicacion" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Amparos'">
+                                    <div class="form-group">
+                                        <label>Fecha de revisión</label>
+                                        <input class="form-control" ng-model="newObjecto.fechaRevision" type="date" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Foraneas'">
+                                    <div class="form-group">
+                                        <label>Estado</label>
+                                        <input name="color" class="form-control" ng-model="newObjecto.estado" ng-blur="getMunicipios();" list="listEstado" type="text" required>
+                                        <datalist id="listEstado">
+                        <option value="{{row}}" ng-repeat="row in dataEstados">
+                    </datalist>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" ng-if="newObjecto.tipo == 'Foraneas'">
+                                    <div class="form-group">
+                                        <label>Municipio</label>
+                                        <input name="color" class="form-control" ng-model="newObjecto.municipio" list="listMunicipios" type="text" required>
+                                        <datalist id="listMunicipios">
+                        <option value="{{row}}" ng-repeat="row in dataMunicipios">
+                    </datalist>
+                                    </div>
+                                </div>
+
+                                <div class=" col-md-6" ng-if="newObjecto.tipo == 'CDMX' || newObjecto.tipo == 'Federal' || newObjecto.tipo == 'Foraneas' || newObjecto.tipo =='Tribunal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Próxima Audiencia<span style="color:red;">*</span>:</label>
+                                        <textarea class="form-control" ng-model="newObjecto.proxAudiencia" required></textarea>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6" ng-if="newObjecto.tipo == 'CDMX' || newObjecto.tipo == 'Federal'|| newObjecto.tipo == 'Foraneas'|| newObjecto.tipo =='Tribunal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Estado Procesal<span style="color:red;">*</span>:</label>
+                                        <textarea class="form-control" ng-model="newObjecto.estadoProcesal" required></textarea>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6" ng-if="newObjecto.tipo == 'Federal'|| newObjecto.tipo =='Tribunal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Amparo<span style="color:red;">*</span>:</label>
+                                        <textarea class="form-control" ng-model="newObjecto.amparo" required></textarea>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6" ng-if="newObjecto.tipo == 'CDMX' || newObjecto.tipo == 'Federal'|| newObjecto.tipo =='Tribunal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Ref<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.ref" required>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6" ng-if="newObjecto.tipo == 'CDMX' || newObjecto.tipo == 'Federal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Contacto<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.contacto" required>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6" ng-if="newObjecto.tipo == 'CDMX' || newObjecto.tipo == 'Federal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">Cuestionario Contrato Porcentaje<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.cuestionarioContrato" required>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6" ng-if="newObjecto.tipo == 'CDMX' || newObjecto.tipo == 'Federal'|| newObjecto.tipo == 'Foraneas'|| newObjecto.tipo =='Tribunal'">
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label">De Quien Es<span style="color:red;">*</span>:</label>
+                                        <input type="text" class="form-control" ng-model="newObjecto.deQuienEs" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</a>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-----------------Modal Comentario--------------------->
+        <div id="modal-comentario" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModallabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form ng-submit="saveComent()">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Comentarios</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="chat" class="chat_box_wrapper chat_box_small chat_box_active" style="opacity: 1; display: block; transform: translateX(0px);">
+                                <div class="chat_box touchscroll chat_box_colors_a">
+
+                                    <div class="chat_message_wrapper" ng-repeat="row in dataEdit.comentarios" ng-class="{chat_message_right: row.user == email}">
+                                        <div class="chat_user_avatar">
+                                            {{row.name}}
+                                        </div>
+                                        <ul class="chat_message">
+                                            <li>
+                                                <p> {{row.comentario}}<span class="chat_message_time">{{row.date}}</span> </p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="text" class="form-control" ng-model="sendText" required>
+                            <button type="submit" class="btn btn-primary">Enviar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script src="./javascript/tableHeadFixer.js"></script>
+        <script src="./javascript/code.js"></script>
+</body>
+
+</html>
